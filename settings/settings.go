@@ -5,7 +5,6 @@ import (
 	"log"
 	"bufio"
 	"strings"
-	//"reflect"
 )
 
 type Validation struct {}
@@ -51,35 +50,39 @@ func (settings *Settings) prepareConfigItem(configLine string) (string, string) 
 	return key, value
 }
 
-// method is reading config and returns go lang object in pattern map[string]string.
-func (settings *Settings) read(path string) {
-	result := make(map[string]string)
+func (settings *Settings) mapSettings(configLine string) {
+	if settings.comments.isComment(configLine) == false {
+		key, value := settings.prepareConfigItem(configLine)
 
-	file, err := os.Open(path)
+		// create config configLine only when key and value are valid.
+		if settings.validation.isValid(key, value) {
+			settings.settings[key] = value
+		}
+	}
+}
+
+// reads settings data from given path.
+func (settings *Settings) read(path string) *os.File {
+	settingsFile, err := os.Open(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer settingsFile.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		configLine := scanner.Text()
-
-		if settings.comments.isComment(configLine) == false {
-			key, value := settings.prepareConfigItem(configLine)
-
-			// create config configLine only when key and value are valid.
-			if settings.validation.isValid(key, value) {
-				result[key] = value
-			}
-		}
-	}
-	settings.settings = result
+	return settingsFile
 }
 
-//Load config
-func (settings *Settings) Load(path string) map[string]string {
-	settings.read(path)
+// Process config
+func (settings *Settings) Process(path string) map[string]string {
+	settings.settings = make(map[string]string)
+	settingsFile := settings.read(path)
+
+	scanner := bufio.NewScanner(settingsFile)
+	for scanner.Scan() {
+		configLine := scanner.Text()
+		settings.mapSettings(configLine)
+	}
+
 	return settings.settings
 }
 
@@ -91,6 +94,6 @@ func (settings *Settings) Get(key string) string {
 // main function to use settings.
 func SetSettings(path string) *Settings {
 	settings := new(Settings)
-	settings.Load(path)
+	settings.Process(path)
 	return settings
 }
