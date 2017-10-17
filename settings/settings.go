@@ -18,7 +18,8 @@ func (settings *Settings) prepareConfigItem(item string) (string, string) {
 	data := strings.Split(item, "=")
 
 	key := strings.Trim(data[0], " ")
-	value := strings.Trim(data[1], " ")
+	value := strings.Join(data[1:len(data)], "=")
+	value = strings.Trim(value, " ")
 
 	return key, value
 }
@@ -70,7 +71,7 @@ func (settings *Settings) Get(key string) string {
 	return settings.settings[key]
 }
 
-// main function do use settings.
+// main function to use settings.
 func SetSettings(path string) *Settings {
 	settings := new(Settings)
 	settings.Load(path)
