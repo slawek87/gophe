@@ -61,7 +61,7 @@ func (settings *Settings) ProcessingConfigFile(configPath string) map[string]str
 	return settings.settings
 }
 
-// Use this method to get value fo given settings item.
+// Use this method to get value of given settings item.
 func (settings *Settings) Get(key string) string {
 	return settings.settings[key]
 }
