@@ -8,8 +8,35 @@ import (
 	//"reflect"
 )
 
+type Validation struct {}
+
+// checks if current key and value are valid settings.
+func (validation *Validation) isValid(key string, value string) bool {
+	if key == "" || value == "" {
+		return false
+	}
+	return true
+}
+
+type Comments struct {}
+
+// checks if given string is a comment.
+func (comments *Comments) isComment(text string) bool {
+	commentsPattern := []string{"/", "//", "#"}
+
+	for _, element := range commentsPattern {
+		if strings.HasPrefix(text, element) == true {
+			return true
+		}
+	}
+
+	return false
+}
+
 type Settings struct {
-	settings    map[string]string
+	settings   	 	map[string]string
+	comments 		Comments
+	validation  	Validation
 }
 
 // method prepares config item to key and value.
@@ -22,20 +49,6 @@ func (settings *Settings) prepareConfigItem(item string) (string, string) {
 	value = strings.Trim(value, " ")
 
 	return key, value
-}
-
-
-// checks if given string is a comment.
-func (settings *Settings) isComment(text string) bool {
-	comments := []string{"/", "//", "#"}
-
-	for _, element := range comments {
-		if strings.HasPrefix(text, element) == true {
-			return true
-		}
-	}
-
-	return false
 }
 
 // method is reading config and returns go lang object in pattern map[string]string.
@@ -52,9 +65,11 @@ func (settings *Settings) read(path string) {
 	for scanner.Scan() {
 		item := scanner.Text()
 
-		if settings.isComment(item) == false {
+		if settings.comments.isComment(item) == false {
 			key, value := settings.prepareConfigItem(scanner.Text())
-			result[key] = value
+			if settings.validation.isValid(key, value) {
+				result[key] = value
+			}
 		}
 	}
 	settings.settings = result
