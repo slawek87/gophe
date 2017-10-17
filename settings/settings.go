@@ -10,7 +10,7 @@ import (
 
 type Validation struct {}
 
-// checks if current key and value are valid settings.
+// checks if current key and value are valid settings - cannot be empty strings.
 func (validation *Validation) isValid(key string, value string) bool {
 	if key == "" || value == "" {
 		return false
@@ -20,7 +20,7 @@ func (validation *Validation) isValid(key string, value string) bool {
 
 type Comments struct {}
 
-// checks if given string is a comment.
+// checks if given string is a comment - starts with: /, //, #.
 func (comments *Comments) isComment(text string) bool {
 	commentsPattern := []string{"/", "//", "#"}
 
@@ -39,13 +39,13 @@ type Settings struct {
 	validation  	Validation
 }
 
-// method prepares config item to key and value.
-// item is a string pattern {key} = {value} and it should be returned as key (string) and value (interface).
-func (settings *Settings) prepareConfigItem(item string) (string, string) {
-	data := strings.Split(item, "=")
+// method prepares config item like key and value fot that key.
+// configLine is a string with pattern {key} = {value}
+func (settings *Settings) prepareConfigItem(configLine string) (string, string) {
+	configData := strings.Split(configLine, "=")
 
-	key := strings.Trim(data[0], " ")
-	value := strings.Join(data[1:len(data)], "=")
+	key := strings.Trim(configData[0], " ")
+	value := strings.Join(configData[1:len(configData)], "=")
 	value = strings.Trim(value, " ")
 
 	return key, value
@@ -63,10 +63,12 @@ func (settings *Settings) read(path string) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		item := scanner.Text()
+		configLine := scanner.Text()
 
-		if settings.comments.isComment(item) == false {
-			key, value := settings.prepareConfigItem(scanner.Text())
+		if settings.comments.isComment(configLine) == false {
+			key, value := settings.prepareConfigItem(configLine)
+
+			// create config configLine only when key and value are valid.
 			if settings.validation.isValid(key, value) {
 				result[key] = value
 			}
