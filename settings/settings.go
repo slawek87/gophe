@@ -13,8 +13,7 @@ type Settings struct {
 	validation  	Validation
 }
 
-// method prepares config item like key and value fot that key.
-// configLine is a string with pattern {key} = {value}
+// We use that method to transform text to key and value objects.
 func (settings *Settings) prepareConfigItem(configLine string) (string, string) {
 	configData := strings.Split(configLine, "=")
 
@@ -25,18 +24,19 @@ func (settings *Settings) prepareConfigItem(configLine string) (string, string) 
 	return key, value
 }
 
+// We use that method to map settings from given configLine.
 func (settings *Settings) mapSettings(configLine string) {
 	if settings.comments.isComment(configLine) == false {
 		key, value := settings.prepareConfigItem(configLine)
 
-		// create config configLine only when key and value are valid.
+		// create settings item only when key and value are valid.
 		if settings.validation.isValid(key, value) {
 			settings.settings[key] = value
 		}
 	}
 }
 
-// reads settings data from given path.
+// Simple read file method.
 func (settings *Settings) read(path string) *os.File {
 	settingsFile, err := os.Open(path)
 	if err != nil {
@@ -47,10 +47,10 @@ func (settings *Settings) read(path string) *os.File {
 	return settingsFile
 }
 
-// Process config
-func (settings *Settings) Process(path string) map[string]string {
+// We use this method to transform config text data to settings object.
+func (settings *Settings) ProcessingConfigFile(configPath string) map[string]string {
 	settings.settings = make(map[string]string)
-	settingsFile := settings.read(path)
+	settingsFile := settings.read(configPath)
 
 	scanner := bufio.NewScanner(settingsFile)
 	for scanner.Scan() {
@@ -61,14 +61,15 @@ func (settings *Settings) Process(path string) map[string]string {
 	return settings.settings
 }
 
-// returns config value for given key. Returns only string values.
+// Use this method to get value fo given settings item.
 func (settings *Settings) Get(key string) string {
 	return settings.settings[key]
 }
 
-// main function to use settings.
-func SetSettings(path string) *Settings {
+
+// main function to initialize settings object.
+func SetSettings(configPath string) *Settings {
 	settings := new(Settings)
-	settings.Process(path)
+	settings.ProcessingConfigFile(configPath)
 	return settings
 }
