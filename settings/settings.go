@@ -13,7 +13,7 @@ type Settings struct {
 	validation  	Validation
 }
 
-// We use that method to transform text to key and value objects.
+// Use that method to transform text to key and value objects.
 func (settings *Settings) prepareConfigItem(configLine string) (string, string) {
 	configData := strings.Split(configLine, "=")
 
@@ -24,7 +24,7 @@ func (settings *Settings) prepareConfigItem(configLine string) (string, string) 
 	return key, value
 }
 
-// We use that method to map settings from given configLine.
+// Use that method to map settings from given configLine.
 func (settings *Settings) mapSettings(configLine string) {
 	if settings.comments.isComment(configLine) == false {
 		key, value := settings.prepareConfigItem(configLine)
@@ -47,7 +47,7 @@ func (settings *Settings) read(path string) *os.File {
 	return settingsFile
 }
 
-// We use this method to transform config text data to settings object.
+// Use this method to transform config text data to settings object.
 func (settings *Settings) ProcessingConfigFile(configPath string) map[string]string {
 	settings.settings = make(map[string]string)
 	settingsFile := settings.read(configPath)
@@ -67,7 +67,7 @@ func (settings *Settings) Get(key string) string {
 }
 
 
-// main function to initialize settings object.
+// This is the main function to setup our config file with Settings object.
 func SetSettings(configPath string) *Settings {
 	settings := new(Settings)
 	settings.ProcessingConfigFile(configPath)
