@@ -7,31 +7,6 @@ import (
 	"strings"
 )
 
-type Validation struct {}
-
-// checks if current key and value are valid settings - cannot be empty strings.
-func (validation *Validation) isValid(key string, value string) bool {
-	if key == "" || value == "" {
-		return false
-	}
-	return true
-}
-
-type Comments struct {}
-
-// checks if given string is a comment - starts with: /, //, #.
-func (comments *Comments) isComment(text string) bool {
-	commentsPattern := []string{"/", "//", "#"}
-
-	for _, element := range commentsPattern {
-		if strings.HasPrefix(text, element) == true {
-			return true
-		}
-	}
-
-	return false
-}
-
 type Settings struct {
 	settings   	 	map[string]string
 	comments 		Comments
