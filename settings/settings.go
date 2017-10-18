@@ -1,3 +1,18 @@
+/*
+Settings module is responsible for create Settings from config file.
+In this module all things named as config means file.cfg - text data. All things named settings mean golang object.
+
+* all values fetched from config are stored in Settings as string object.
+
+Example of use:
+
+mySettings := SetSettings("mySettings.cfg") // config include DEBUG = true
+
+fmt.println(mySettings.Get("DEBUG")) // print "true" string value
+
+mySettings.Set(DEBUG, false) // set DEBUG to false boolean value.
+
+ */
 package settings
 
 import (
@@ -13,7 +28,8 @@ type Settings struct {
 	validation  	Validation
 }
 
-// Method to transform text to key and value to golang object.
+// Method transforms text to golang objects.
+// We need key and value to create settings item.
 func (settings *Settings) prepareConfigItem(configLine string) (string, string) {
 	configData := strings.Split(configLine, "=")
 
@@ -24,7 +40,7 @@ func (settings *Settings) prepareConfigItem(configLine string) (string, string) 
 	return key, value
 }
 
-// Method takes configLine and transform it to golang object.
+// Method takes configLine and transforms it to golang object.
 // Returns only valid objects - with valid key and value.
 func (settings *Settings) mapSettings(configLine string) {
 	if settings.comments.isComment(configLine) == false {
@@ -47,7 +63,7 @@ func (settings *Settings) read(path string) *os.File {
 	return settingsFile
 }
 
-// This method run all operations needed to transform text config to golang object.
+// This method run all operations needed to transform text config to golang object - settings.
 func (settings *Settings) ProcessingConfigFile(configPath string) map[string]string {
 	settings.settings = make(map[string]string)
 	settingsFile := settings.read(configPath)
@@ -62,11 +78,15 @@ func (settings *Settings) ProcessingConfigFile(configPath string) map[string]str
 	return settings.settings
 }
 
-// Method returns config items with given key.
+// Method returns settings item with given key.
 func (settings *Settings) Get(key string) string {
 	return settings.settings[key]
 }
 
+// Method gives opportunity to set settings item directly from code.
+func (settings *Settings) Set(key string, value string) {
+	settings.settings[key] = value
+}
 
 // This is the main function to setup our config file to Settings object.
 func SetSettings(configPath string) *Settings {
