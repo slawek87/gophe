@@ -13,7 +13,7 @@ type Settings struct {
 	validation  	Validation
 }
 
-// Use that method to transform text to key and value objects.
+// Method to transform text to key and value to golang object.
 func (settings *Settings) prepareConfigItem(configLine string) (string, string) {
 	configData := strings.Split(configLine, "=")
 
@@ -24,7 +24,8 @@ func (settings *Settings) prepareConfigItem(configLine string) (string, string) 
 	return key, value
 }
 
-// Use that method to map settings from given configLine.
+// Method takes configLine and transform it to golang object.
+// Returns only valid objects - with valid key and value.
 func (settings *Settings) mapSettings(configLine string) {
 	if settings.comments.isComment(configLine) == false {
 		key, value := settings.prepareConfigItem(configLine)
@@ -42,15 +43,15 @@ func (settings *Settings) read(path string) *os.File {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer settingsFile.Close()
 
 	return settingsFile
 }
 
-// Use this method to transform config text data to settings object.
+// This method run all operations needed to transform text config to golang object.
 func (settings *Settings) ProcessingConfigFile(configPath string) map[string]string {
 	settings.settings = make(map[string]string)
 	settingsFile := settings.read(configPath)
+	defer settingsFile.Close()
 
 	scanner := bufio.NewScanner(settingsFile)
 	for scanner.Scan() {
@@ -61,13 +62,13 @@ func (settings *Settings) ProcessingConfigFile(configPath string) map[string]str
 	return settings.settings
 }
 
-// Use this method to get value of given settings item.
+// Method returns config items with given key.
 func (settings *Settings) Get(key string) string {
 	return settings.settings[key]
 }
 
 
-// This is the main function to setup our config file with Settings object.
+// This is the main function to setup our config file to Settings object.
 func SetSettings(configPath string) *Settings {
 	settings := new(Settings)
 	settings.ProcessingConfigFile(configPath)
