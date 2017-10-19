@@ -1,6 +1,8 @@
 /*
 Settings module is responsible for create Settings from config file.
-In this module all things named as config means file.cfg - text data. All things named settings mean golang object.
+
+In this module all things named as config means file.cfg - text data.
+All things named settings mean golang object.
 
 * all values fetched from config are stored in Settings as string object.
 
